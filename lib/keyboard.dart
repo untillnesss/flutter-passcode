@@ -13,8 +13,9 @@ class KeyboardUIConfig {
   final EdgeInsetsGeometry keyboardRowMargin;
   final EdgeInsetsGeometry digitInnerMargin;
 
-  //Size for the keyboard can be define and provided from the app. If it will not be provided the size will be adjusted to a screen size.
-  final Size keyboardSize;
+  //Size for the keyboard can be define and provided from the app.
+  //If it will not be provided the size will be adjusted to a screen size.
+  final Size? keyboardSize;
 
   const KeyboardUIConfig({
     this.digitBorderWidth = 1,
@@ -36,14 +37,12 @@ class Keyboard extends StatelessWidget {
   final Function onDeleteButtonPress;
 
   //should have a proper order [1...9, 0]
-  final List<String> digits;
+  final List<String>? digits;
 
   Keyboard({
-    Key key,
-    @required this.keyboardUIConfig,
-    @required this.onKeyboardTap,
-    @required this.deleteButton,
-    @required this.onDeleteButtonPress,
+    Key? key,
+    required this.keyboardUIConfig,
+    required this.onKeyboardTap,
     this.digits,
   }) : super(key: key);
 
@@ -52,10 +51,10 @@ class Keyboard extends StatelessWidget {
 
   Widget _buildKeyboard(BuildContext context) {
     List<String> keyboardItems = List.filled(10, '0');
-    if (digits == null || digits.isEmpty) {
-      keyboardItems = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    if (digits == null || digits!.isEmpty) {
+      keyboardItems = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
     } else {
-      keyboardItems = digits;
+      keyboardItems = digits!;
     }
     final screenSize = MediaQuery.of(context).size;
     final keyboardHeight = screenSize.height > screenSize.width
@@ -63,7 +62,7 @@ class Keyboard extends StatelessWidget {
         : screenSize.height - 80;
     final keyboardWidth = keyboardHeight * 3 / 4;
     final keyboardSize = this.keyboardUIConfig.keyboardSize != null
-        ? this.keyboardUIConfig.keyboardSize
+        ? this.keyboardUIConfig.keyboardSize!
         : Size(keyboardWidth, keyboardHeight);
     return Container(
       width: keyboardSize.width,
@@ -149,7 +148,7 @@ class AlignedGrid extends StatelessWidget {
   final Size keyboardSize;
 
   const AlignedGrid(
-      {Key key, @required this.children, @required this.keyboardSize})
+      {Key? key, required this.children, required this.keyboardSize})
       : listSize = children.length,
         super(key: key);
 

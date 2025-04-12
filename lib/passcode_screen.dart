@@ -15,45 +15,40 @@ typedef CancelCallback = void Function();
 class PasscodeScreen extends StatefulWidget {
   final Widget title;
   final int passwordDigits;
-  final Color backgroundColor;
   final PasswordEnteredCallback passwordEnteredCallback;
-
-  //isValidCallback will be invoked after passcode screen will pop.
-  final IsValidCallback isValidCallback;
-  final CancelCallback cancelCallback;
-
   // Cancel button and delete button will be switched based on the screen state
   final Widget cancelButton;
   final Widget deleteButton;
   final Widget headerAction, headerWidget;
   final Stream<bool> shouldTriggerVerification;
-  final Widget bottomWidget;
   final CircleUIConfig circleUIConfig;
   final KeyboardUIConfig keyboardUIConfig;
-  final List<String> digits;
+
+  //isValidCallback will be invoked after passcode screen will pop.
+  final IsValidCallback? isValidCallback;
+  final CancelCallback? cancelCallback;
+
+  final Color? backgroundColor;
+  final Widget? bottomWidget;
+  final List<String>? digits;
 
   PasscodeScreen({
-    Key key,
-    @required this.title,
+    Key? key,
+    required this.title,
     this.passwordDigits = 6,
-    @required this.passwordEnteredCallback,
-    @required this.cancelButton,
-    @required this.deleteButton,
-    @required this.shouldTriggerVerification,
+    required this.passwordEnteredCallback,
+    required this.cancelButton,
+    required this.deleteButton,
+    required this.shouldTriggerVerification,
     this.isValidCallback,
-    CircleUIConfig circleUIConfig,
-    KeyboardUIConfig keyboardUIConfig,
+    CircleUIConfig? circleUIConfig,
+    KeyboardUIConfig? keyboardUIConfig,
     this.bottomWidget,
     this.backgroundColor,
     this.cancelCallback,
     this.digits,
-    this.headerAction,
-    this.headerWidget,
-  })  : circleUIConfig =
-            circleUIConfig == null ? const CircleUIConfig() : circleUIConfig,
-        keyboardUIConfig = keyboardUIConfig == null
-            ? const KeyboardUIConfig()
-            : keyboardUIConfig,
+  })  : circleUIConfig = circleUIConfig ?? const CircleUIConfig(),
+        keyboardUIConfig = keyboardUIConfig ?? const KeyboardUIConfig(),
         super(key: key);
 
   @override
@@ -62,10 +57,10 @@ class PasscodeScreen extends StatefulWidget {
 
 class _PasscodeScreenState extends State<PasscodeScreen>
     with SingleTickerProviderStateMixin {
-  StreamSubscription<bool> streamSubscription;
+  late StreamSubscription<bool> streamSubscription;
   String enteredPasscode = '';
-  AnimationController controller;
-  Animation<double> animation;
+  late AnimationController controller;
+  late Animation<double> animation;
 
   @override
   initState() {
@@ -76,7 +71,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         duration: const Duration(milliseconds: 500), vsync: this);
     final Animation curve =
         CurvedAnimation(parent: controller, curve: ShakeCurve());
-    animation = Tween(begin: 0.0, end: 10.0).animate(curve)
+    animation = Tween(begin: 0.0, end: 10.0).animate(curve as Animation<double>)
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           setState(() {
@@ -115,7 +110,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
+                children: [
                   widget.title,
                   Container(
                     margin: const EdgeInsets.only(
@@ -127,12 +122,8 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                       children: _buildCircles(),
                     ),
                   ),
-                  widget.headerAction ?? SizedBox.shrink(),
-                  _buildKeyboard(
-                      enteredPasscode.length == 0
-                          ? widget.cancelButton
-                          : widget.deleteButton,
-                      _onDeleteCancelButtonPressed),
+                  _buildKeyboard(),
+                  widget.bottomWidget ?? Container()
                 ],
               ),
             ),
@@ -251,7 +242,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       });
     } else {
       if (widget.cancelCallback != null) {
-        widget.cancelCallback();
+        widget.cancelCallback!();
       }
     }
   }
@@ -296,7 +287,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
 
   _validationCallback() {
     if (widget.isValidCallback != null) {
-      widget.isValidCallback();
+      widget.isValidCallback!();
     } else {
       print(
           "You didn't implement validation callback. Please handle a state by yourself then.");
